@@ -1169,8 +1169,8 @@ export type Mutation = {
   createOneServerlessFunction: ServerlessFunction;
   createSAMLIdentityProvider: SetupSsoOutput;
   createWebhook: Webhook;
-  createWorkflowVersionEdge: WorkflowEdge;
-  createWorkflowVersionStep: WorkflowAction;
+  createWorkflowVersionEdge: WorkflowVersionStepUpdates;
+  createWorkflowVersionStep: WorkflowVersionStepUpdates;
   deactivateWorkflowVersion: Scalars['Boolean'];
   deleteApprovedAccessDomain: Scalars['Boolean'];
   deleteCurrentWorkspace: Workspace;
@@ -1186,8 +1186,8 @@ export type Mutation = {
   deleteTwoFactorAuthenticationMethod: DeleteTwoFactorAuthenticationMethodOutput;
   deleteUser: User;
   deleteWebhook: Scalars['Boolean'];
-  deleteWorkflowVersionEdge: WorkflowEdge;
-  deleteWorkflowVersionStep: WorkflowAction;
+  deleteWorkflowVersionEdge: WorkflowVersionStepUpdates;
+  deleteWorkflowVersionStep: WorkflowVersionStepUpdates;
   deleteWorkspaceInvitation: Scalars['String'];
   disablePostgresProxy: PostgresCredentials;
   editSSOIdentityProvider: EditSsoOutput;
@@ -3057,12 +3057,6 @@ export type WorkflowAction = {
   valid: Scalars['Boolean'];
 };
 
-export type WorkflowEdge = {
-  __typename?: 'WorkflowEdge';
-  source: Scalars['String'];
-  target: Scalars['String'];
-};
-
 export type WorkflowRun = {
   __typename?: 'WorkflowRun';
   workflowRunId: Scalars['UUID'];
@@ -3097,6 +3091,14 @@ export type WorkflowVersionEdgeInput = {
   target: Scalars['String'];
   /** Workflow version ID */
   workflowVersionId: Scalars['String'];
+};
+
+export type WorkflowVersionStepUpdates = {
+  __typename?: 'WorkflowVersionStepUpdates';
+  createdStep?: Maybe<WorkflowAction>;
+  deletedStepId?: Maybe<Scalars['String']>;
+  stepsNextStepIds?: Maybe<Scalars['JSON']>;
+  triggerNextStepIds?: Maybe<Array<Scalars['String']>>;
 };
 
 export type Workspace = {
@@ -4133,14 +4135,14 @@ export type CreateWorkflowVersionEdgeMutationVariables = Exact<{
 }>;
 
 
-export type CreateWorkflowVersionEdgeMutation = { __typename?: 'Mutation', createWorkflowVersionEdge: { __typename?: 'WorkflowEdge', source: string, target: string } };
+export type CreateWorkflowVersionEdgeMutation = { __typename?: 'Mutation', createWorkflowVersionEdge: { __typename?: 'WorkflowVersionStepUpdates', triggerNextStepIds?: Array<string> | null, stepsNextStepIds?: any | null } };
 
 export type CreateWorkflowVersionStepMutationVariables = Exact<{
   input: CreateWorkflowVersionStepInput;
 }>;
 
 
-export type CreateWorkflowVersionStepMutation = { __typename?: 'Mutation', createWorkflowVersionStep: { __typename?: 'WorkflowAction', id: any, name: string, type: string, settings: any, valid: boolean, nextStepIds?: Array<any> | null, position?: { __typename?: 'WorkflowStepPosition', x: number, y: number } | null } };
+export type CreateWorkflowVersionStepMutation = { __typename?: 'Mutation', createWorkflowVersionStep: { __typename?: 'WorkflowVersionStepUpdates', triggerNextStepIds?: Array<string> | null, stepsNextStepIds?: any | null, createdStep?: { __typename?: 'WorkflowAction', id: any, name: string, type: string, settings: any, valid: boolean, nextStepIds?: Array<any> | null, position?: { __typename?: 'WorkflowStepPosition', x: number, y: number } | null } | null } };
 
 export type DeactivateWorkflowVersionMutationVariables = Exact<{
   workflowVersionId: Scalars['String'];
@@ -4154,14 +4156,14 @@ export type DeleteWorkflowVersionEdgeMutationVariables = Exact<{
 }>;
 
 
-export type DeleteWorkflowVersionEdgeMutation = { __typename?: 'Mutation', deleteWorkflowVersionEdge: { __typename?: 'WorkflowEdge', source: string, target: string } };
+export type DeleteWorkflowVersionEdgeMutation = { __typename?: 'Mutation', deleteWorkflowVersionEdge: { __typename?: 'WorkflowVersionStepUpdates', triggerNextStepIds?: Array<string> | null, stepsNextStepIds?: any | null } };
 
 export type DeleteWorkflowVersionStepMutationVariables = Exact<{
   input: DeleteWorkflowVersionStepInput;
 }>;
 
 
-export type DeleteWorkflowVersionStepMutation = { __typename?: 'Mutation', deleteWorkflowVersionStep: { __typename?: 'WorkflowAction', id: any, name: string, type: string, settings: any, valid: boolean, nextStepIds?: Array<any> | null, position?: { __typename?: 'WorkflowStepPosition', x: number, y: number } | null } };
+export type DeleteWorkflowVersionStepMutation = { __typename?: 'Mutation', deleteWorkflowVersionStep: { __typename?: 'WorkflowVersionStepUpdates', triggerNextStepIds?: Array<string> | null, stepsNextStepIds?: any | null, deletedStepId?: string | null } };
 
 export type RunWorkflowVersionMutationVariables = Exact<{
   input: RunWorkflowVersionInput;
@@ -9255,8 +9257,8 @@ export type CreateDraftFromWorkflowVersionMutationOptions = Apollo.BaseMutationO
 export const CreateWorkflowVersionEdgeDocument = gql`
     mutation CreateWorkflowVersionEdge($input: WorkflowVersionEdgeInput!) {
   createWorkflowVersionEdge(input: $input) {
-    source
-    target
+    triggerNextStepIds
+    stepsNextStepIds
   }
 }
     `;
@@ -9289,15 +9291,19 @@ export type CreateWorkflowVersionEdgeMutationOptions = Apollo.BaseMutationOption
 export const CreateWorkflowVersionStepDocument = gql`
     mutation CreateWorkflowVersionStep($input: CreateWorkflowVersionStepInput!) {
   createWorkflowVersionStep(input: $input) {
-    id
-    name
-    type
-    settings
-    valid
-    nextStepIds
-    position {
-      x
-      y
+    triggerNextStepIds
+    stepsNextStepIds
+    createdStep {
+      id
+      name
+      type
+      settings
+      valid
+      nextStepIds
+      position {
+        x
+        y
+      }
     }
   }
 }
@@ -9362,8 +9368,8 @@ export type DeactivateWorkflowVersionMutationOptions = Apollo.BaseMutationOption
 export const DeleteWorkflowVersionEdgeDocument = gql`
     mutation DeleteWorkflowVersionEdge($input: WorkflowVersionEdgeInput!) {
   deleteWorkflowVersionEdge(input: $input) {
-    source
-    target
+    triggerNextStepIds
+    stepsNextStepIds
   }
 }
     `;
@@ -9396,16 +9402,9 @@ export type DeleteWorkflowVersionEdgeMutationOptions = Apollo.BaseMutationOption
 export const DeleteWorkflowVersionStepDocument = gql`
     mutation DeleteWorkflowVersionStep($input: DeleteWorkflowVersionStepInput!) {
   deleteWorkflowVersionStep(input: $input) {
-    id
-    name
-    type
-    settings
-    valid
-    nextStepIds
-    position {
-      x
-      y
-    }
+    triggerNextStepIds
+    stepsNextStepIds
+    deletedStepId
   }
 }
     `;
